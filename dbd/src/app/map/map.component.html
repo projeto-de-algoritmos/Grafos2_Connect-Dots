@@ -1,0 +1,7 @@
+<div class="flex flex-col m-4">
+    <div class="flex flex-row" *ngFor="let item of [].constructor(29); let l = index">
+        <div *ngFor="let item of [].constructor(29); let c = index">
+            <span [class]="'block h-6 w-6 border-2 border-gray-500 ' + getColor({l:l, c:c})"></span>
+        </div>
+    </div>
+</div>
