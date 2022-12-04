@@ -1,7 +1,14 @@
-<div class="flex flex-col m-4">
+<div class="flex flex-col m-4" (keyup)="teste($event)">
     <div class="flex flex-row" *ngFor="let item of [].constructor(29); let l = index">
         <div *ngFor="let item of [].constructor(29); let c = index">
-            <span [class]="'block h-6 w-6 border-2 border-gray-500 ' + getColor({l:l, c:c})"></span>
+            <div *ngIf="!hasCharacter(l, c); else character" [class]="'block h-7 w-7 border-2 border-gray-500 ' + getColor(l, c)">
+            </div>
         </div>
     </div>
 </div>
+
+<ng-template #character>
+    <div class="block h-7 w-7 ">
+        <img [src]="(isPlayer) ? '../../assets/survivor.png' : '../../assets/killer.jpeg'" alt="character" width="28" height="28">
+    </div>
+</ng-template>

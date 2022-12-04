@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LinkedList } from '../lista';
+import { HostListener } from '@angular/core';
 
 interface Arestas {
   de: number;
@@ -28,6 +29,7 @@ export class MapComponent implements OnInit {
     {l:3,c:8},
     {l:4,c:19},
     {l:8,c:17},
+    {l:10,c:15},
     {l:12,c:5},
     {l:18,c:15},
     {l:22,c:9},
@@ -57,14 +59,82 @@ export class MapComponent implements OnInit {
     {l:23,c:23},
   ]
 
-  playerPosition: Casa = {} as Casa;;
+  playerPosition: Casa = {} as Casa;
+  isPlayer: boolean = false;
   killerPosition: Casa = {} as Casa;
+  isKiller: boolean = false;
+
+  key: any;
 
   constructor() { }
+
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) { 
+    let key = event.key;
+    
+    if(key=='w'){
+      if(this.hasPosition(this.white, this.playerPosition.l-1, this.playerPosition.c))
+        this.playerPosition.l--;
+      else if(this.hasPosition(this.windows, this.playerPosition.l-1, this.playerPosition.c))
+        this.playerPosition.l--;
+    }
+    if(key=='a'){
+      if(this.hasPosition(this.white, this.playerPosition.l, this.playerPosition.c-1))
+        this.playerPosition.c--;
+      else if(this.hasPosition(this.windows, this.playerPosition.l, this.playerPosition.c-1))
+        this.playerPosition.c--;
+    }
+    if(key=='s'){
+      if(this.hasPosition(this.white, this.playerPosition.l+1, this.playerPosition.c))
+        this.playerPosition.l++;
+      else if(this.hasPosition(this.windows, this.playerPosition.l+1, this.playerPosition.c))
+        this.playerPosition.l++;
+    }
+    if(key=='d'){
+      if(this.hasPosition(this.white, this.playerPosition.l, this.playerPosition.c+1))
+        this.playerPosition.c++;
+      else if(this.hasPosition(this.windows, this.playerPosition.l, this.playerPosition.c+1))
+        this.playerPosition.c++;
+    }
+  }
 
   ngOnInit(): void {
     this.mapInit();
     this.startPositions();
+
+    document.addEventListener('keyup', (event) => {
+      var name = event.key;
+      if (name === 'Control') {
+        console.log('Control key released');
+      }
+    }, false);
+  }
+
+  teste(event:any){
+    console.log(event);
+    
+  }
+
+  hasPosition(array: Casa[], l:number, c:number):boolean {
+    if(array.find(a=>a.l==l && a.c==c)!== undefined)
+      return true
+    return false
+  }
+
+  hasCharacter(l:number, c: number): boolean{
+    if(this.playerPosition.l==l && this.playerPosition.c==c){
+      this.isPlayer = true;
+      this.isKiller = false;
+      return true;
+    };
+    if(this.killerPosition.l==l && this.killerPosition.c==c){
+      this.isPlayer = false;
+      this.isKiller = true;
+      return true;
+    };
+    this.isPlayer = false;
+    this.isKiller = false;
+    return false;
   }
 
   startPositions(){
@@ -79,25 +149,25 @@ export class MapComponent implements OnInit {
     console.log(this.killerPosition);
   }
 
-  getColor(casa: Casa){
+  getColor(l:number, c: number){
 
-    if(this.palets.find(a=>a.casa.l==casa.l && a.casa.c==casa.c)!== undefined){
-      if(this.palets.find(a=>a.casa.l==casa.l && a.casa.c==casa.c)?.aberta == true)
+    if(this.palets.find(a=>a.casa.l==l && a.casa.c==c)!== undefined){
+      if(this.palets.find(a=>a.casa.l==l && a.casa.c==c)?.aberta == true)
         return 'bg-red-300';
       else 
         return 'bg-red-500';
     }
 
-    if(this.white.find(a=>a.l==casa.l && a.c==casa.c)!== undefined)
+    if(this.white.find(a=>a.l==l && a.c==c)!== undefined)
       return 'bg-white'
 
-    if(this.windows.find(a=>a.l==casa.l && a.c==casa.c)!== undefined)
+    if(this.windows.find(a=>a.l==l && a.c==c)!== undefined)
       return 'bg-blue-500'
     
-    if(this.generators.find(a=>a.l==casa.l && a.c==casa.c)!== undefined)
+    if(this.generators.find(a=>a.l==l && a.c==c)!== undefined)
       return 'bg-yellow-500'
 
-    if(casa.l==28 && casa.c==15)
+    if(l==28 && c==15)
       return 'bg-green-500'
 
     return 'bg-black';
