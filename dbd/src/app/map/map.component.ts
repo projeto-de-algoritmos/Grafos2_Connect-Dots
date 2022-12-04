@@ -58,61 +58,151 @@ export class MapComponent implements OnInit {
     {l:23,c:5},
     {l:23,c:23},
   ]
+  generatorsProgress = [0,0,0,0,0];
 
   playerPosition: Casa = {} as Casa;
   isPlayer: boolean = false;
   killerPosition: Casa = {} as Casa;
   isKiller: boolean = false;
+  direcao: string = 'L';
 
   key: any;
+  lastTimeStamp:number = 0;
 
   constructor() { }
 
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
     let key = event.key;
-    
-    if(key=='w'){
-      if(this.hasPosition(this.white, this.playerPosition.l-1, this.playerPosition.c))
-        this.playerPosition.l--;
-      else if(this.hasPosition(this.windows, this.playerPosition.l-1, this.playerPosition.c))
-        this.playerPosition.l--;
+    if(event.timeStamp-this.lastTimeStamp>200){
+      this.lastTimeStamp = event.timeStamp;
+      
+      if(this.hasPalet()!='emCima'){
+        if(key=='w'){
+          this.direcao='N';
+        }
+        if(key=='a'){
+          this.direcao='O';
+        }
+        if(key=='s'){
+          this.direcao='S';
+        }
+        if(key=='d'){
+          this.direcao='L';
+        }
+      }
     }
-    if(key=='a'){
-      if(this.hasPosition(this.white, this.playerPosition.l, this.playerPosition.c-1))
-        this.playerPosition.c--;
-      else if(this.hasPosition(this.windows, this.playerPosition.l, this.playerPosition.c-1))
-        this.playerPosition.c--;
-    }
-    if(key=='s'){
-      if(this.hasPosition(this.white, this.playerPosition.l+1, this.playerPosition.c))
-        this.playerPosition.l++;
-      else if(this.hasPosition(this.windows, this.playerPosition.l+1, this.playerPosition.c))
-        this.playerPosition.l++;
-    }
-    if(key=='d'){
-      if(this.hasPosition(this.white, this.playerPosition.l, this.playerPosition.c+1))
-        this.playerPosition.c++;
-      else if(this.hasPosition(this.windows, this.playerPosition.l, this.playerPosition.c+1))
-        this.playerPosition.c++;
+
+    if(key=='e'){
+      this.acao();
     }
   }
 
   ngOnInit(): void {
     this.mapInit();
     this.startPositions();
-
-    document.addEventListener('keyup', (event) => {
-      var name = event.key;
-      if (name === 'Control') {
-        console.log('Control key released');
-      }
-    }, false);
+    if(this.playerPosition.l==5) this.direcao = "L";
+    else this.direcao = "N";
+    this.survivorMoviment();
   }
 
-  teste(event:any){
-    console.log(event);
+  acao(){
+    let palet = this.hasPalet();
+    let generator = this.hasGenerator();
+
+    if(palet){
+      this.palets.forEach(p=>{
+        if(p==palet) p.aberta = false;
+      })
+    }
+    if(generator){
+      this.generators.forEach((g, i)=>{
+        if(g==generator) this.generatorProgress(i);
+        
+      })
+    }
     
+  }
+
+  hasPalet():any{
+    let mesmaLinha = this.palets.filter(a=>a.aberta==true).filter(a=>a.casa.l==this.playerPosition.l).find(a=>
+      a.casa.c == this.playerPosition.c-1 || a.casa.c == this.playerPosition.c+1);
+    let mesmaColuna = this.palets.filter(a=>a.aberta==true).filter(a=>a.casa.c==this.playerPosition.c).find(a=>
+      a.casa.l == this.playerPosition.l-1 || a.casa.l == this.playerPosition.l+1);
+
+    let emCima = this.palets.filter(a=>a.aberta==false).filter(a=>a.casa.l==this.playerPosition.l).find(a=>
+      a.casa.c == this.playerPosition.c || a.casa.c == this.playerPosition.c);
+
+    if(mesmaLinha !== undefined) return mesmaLinha;
+    else if (mesmaColuna !== undefined) return mesmaColuna;
+    else if (emCima) return 'emCima';
+      
+    return false;
+  }
+
+  hasGenerator():any{
+    let mesmaLinha = this.generators.filter(a=>a.l==this.playerPosition.l).find(a=>
+      a.c==this.playerPosition.c-1 || a.c==this.playerPosition.c+1);
+    let mesmaColuna = this.generators.filter(a=>a.c==this.playerPosition.c).find(a=>
+      a.l==this.playerPosition.l-1 || a.l==this.playerPosition.l+1);
+
+    if(mesmaLinha !== undefined) return mesmaLinha;
+    else if (mesmaColuna !== undefined) return mesmaColuna;
+
+    return false;
+  }
+
+  generatorProgress(generator:any){
+    setTimeout(()=>{
+      if(this.hasGenerator()){
+        if(this.generatorsProgress[generator]<10)
+          this.generatorsProgress[generator]++;
+        if(this.generatorsProgress[generator]==10) this.completeGenerator(generator);
+        this.generatorProgress(generator);
+      }
+    }, 1000);
+    if(this.generatorsProgress.filter(a=>a==10).length==5){
+      this.white.push({l:28,c:15})
+    }
+  }
+
+  completeGenerator(generator:any){
+    
+  }
+
+  survivorMoviment(){
+
+    setTimeout(()=>{
+      if(this.direcao=='L'){
+        if(this.hasPosition(this.white, this.playerPosition.l, this.playerPosition.c+1))
+          this.playerPosition.c++;
+        else if(this.hasPosition(this.windows, this.playerPosition.l, this.playerPosition.c+1))
+          this.playerPosition.c++;
+        
+      }
+      if(this.direcao=='O'){
+        if(this.hasPosition(this.white, this.playerPosition.l, this.playerPosition.c-1))
+          this.playerPosition.c--;
+        else if(this.hasPosition(this.windows, this.playerPosition.l, this.playerPosition.c-1))
+          this.playerPosition.c--;
+        
+      }
+      if(this.direcao=='N'){
+        if(this.hasPosition(this.white, this.playerPosition.l-1, this.playerPosition.c))
+          this.playerPosition.l--;
+        else if(this.hasPosition(this.windows, this.playerPosition.l-1, this.playerPosition.c))
+          this.playerPosition.l--;
+        
+      }
+      if(this.direcao=='S'){
+        if(this.hasPosition(this.white, this.playerPosition.l+1, this.playerPosition.c))
+          this.playerPosition.l++;
+        else if(this.hasPosition(this.windows, this.playerPosition.l+1, this.playerPosition.c))
+          this.playerPosition.l++;
+        
+      }
+      this.survivorMoviment();
+    }, 250);
   }
 
   hasPosition(array: Casa[], l:number, c:number):boolean {
@@ -140,13 +230,11 @@ export class MapComponent implements OnInit {
   startPositions(){
     let index = Math.floor(Math.random() * 4)
     this.playerPosition = this.start[index]
-    console.log(this.playerPosition);
 
     if(this.playerPosition.l == 5) this.killerPosition.l = 23;
     else this.killerPosition.l = 5;
     if(this.playerPosition.c == 5) this.killerPosition.c = 23;
     else this.killerPosition.c = 5;
-    console.log(this.killerPosition);
   }
 
   getColor(l:number, c: number){
@@ -164,11 +252,17 @@ export class MapComponent implements OnInit {
     if(this.windows.find(a=>a.l==l && a.c==c)!== undefined)
       return 'bg-blue-500'
     
-    if(this.generators.find(a=>a.l==l && a.c==c)!== undefined)
-      return 'bg-yellow-500'
+    if(this.generators.find(a=>a.l==l && a.c==c)!== undefined){
+      let generator = this.generators.find(a=>a.l==l && a.c==c)!;
+      if(this.generatorsProgress[this.generators.indexOf(generator)]==10)
+        return 'bg-gray-500'
+      else 
+        return 'bg-yellow-500'
+    }
 
-    if(l==28 && c==15)
+    if(l==28 && c==15){
       return 'bg-green-500'
+    }
 
     return 'bg-black';
   }

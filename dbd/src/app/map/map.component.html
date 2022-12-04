@@ -1,7 +1,12 @@
-<div class="flex flex-col m-4" (keyup)="teste($event)">
+<div class="flex flex-col m-4">
     <div class="flex flex-row" *ngFor="let item of [].constructor(29); let l = index">
         <div *ngFor="let item of [].constructor(29); let c = index">
-            <div *ngIf="!hasCharacter(l, c); else character" [class]="'block h-7 w-7 border-2 border-gray-500 ' + getColor(l, c)">
+            <div *ngIf="!hasCharacter(l, c); else character" [class]="'block h-7 w-7 text-center border-2 border-gray-500 ' + getColor(l, c)">
+                <span *ngIf="l==3 && c==3">{{generatorsProgress[0]}}</span>
+                <span *ngIf="l==3 && c==25">{{generatorsProgress[1]}}</span>
+                <span *ngIf="l==16 && c==16">{{generatorsProgress[2]}}</span>
+                <span *ngIf="l==22 && c==2">{{generatorsProgress[3]}}</span>
+                <span *ngIf="l==28 && c==25">{{generatorsProgress[4]}}</span>
             </div>
         </div>
     </div>
