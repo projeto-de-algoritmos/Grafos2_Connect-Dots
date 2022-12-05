@@ -85,9 +85,12 @@ export class MapComponent implements OnInit {
 
   playerPosition: Casa = {} as Casa;
   isPlayer: boolean = false;
+  isInjuriedPlayer: boolean = false;
   killerPosition: Casa = {} as Casa;
   isKiller: boolean = false;
   direcao: string = 'L';
+  visibleKiller: boolean = false;
+  visibleRange = 15;
 
   key: any;
   lastTimeStamp:number = 0;
@@ -131,7 +134,9 @@ export class MapComponent implements OnInit {
     
     if(this.playerPosition.l==5) this.direcao = "L";
     else this.direcao = "N";
+    //start
     this.survivorMoviment();
+    this.killerMoviment();
   }
 
   acao(){
@@ -152,9 +157,6 @@ export class MapComponent implements OnInit {
         
       })
     }
-    console.log(this.listas[1419]);
-    console.log(this.listas[1519]);
-    console.log(this.listas[1619]);
   }
 
   hasPalet():any{
@@ -198,7 +200,6 @@ export class MapComponent implements OnInit {
     }
   }
 
-
   survivorMoviment(){
 
     setTimeout(()=>{
@@ -234,6 +235,93 @@ export class MapComponent implements OnInit {
     }, 250);
   }
 
+  killerMoviment(){
+    let l = this.killerPosition.l;
+    let c = this.killerPosition.c;
+    setTimeout(()=>{
+      if(this.hasPosition(this.todos_os_lados, l, c)){
+        let index = Math.floor(Math.random() * 4);
+        if(index==0) this.killerPosition.l--;
+        if(index==1) this.killerPosition.l++;
+        if(index==2) this.killerPosition.c--;
+        if(index==3) this.killerPosition.c++;
+      }
+      if(this.hasPosition(this.direita_cima_esquerda, l, c)){
+        let index = Math.floor(Math.random() * 3);
+        if(index==0) this.killerPosition.l--;
+        if(index==1) this.killerPosition.c++;
+        if(index==2) this.killerPosition.c--;
+      }
+      if(this.hasPosition(this.direita_baixo_esquerda, l, c)){
+        let index = Math.floor(Math.random() * 3);
+        if(index==0) this.killerPosition.l++;
+        if(index==1) this.killerPosition.c++;
+        if(index==2) this.killerPosition.c--;
+      }
+      if(this.hasPosition(this.cima_baixo_direita, l, c)){
+        let index = Math.floor(Math.random() * 3);
+        if(index==0) this.killerPosition.l--;
+        if(index==1) this.killerPosition.l++;
+        if(index==2) this.killerPosition.c++;
+      }
+      if(this.hasPosition(this.cima_baixo_esquerda, l, c)){
+        let index = Math.floor(Math.random() * 3);
+        if(index==0) this.killerPosition.l--;
+        if(index==1) this.killerPosition.l++;
+        if(index==2) this.killerPosition.c--;
+      }
+      if(this.hasPosition(this.direita_esquerda, l, c)){
+        let index = Math.floor(Math.random() * 2);
+        if(index==0) this.killerPosition.c++;
+        if(index==1) this.killerPosition.c--;
+      }
+      if(this.hasPosition(this.direita_cima, l, c)){
+        let index = Math.floor(Math.random() * 2);
+        if(index==0) this.killerPosition.c++;
+        if(index==1) this.killerPosition.l--;
+      }
+      if(this.hasPosition(this.direita_baixo, l, c)){
+        let index = Math.floor(Math.random() * 2);
+        if(index==0) this.killerPosition.c++;
+        if(index==1) this.killerPosition.l++;
+      }
+      if(this.hasPosition(this.cima_esquerda, l, c)){
+        let index = Math.floor(Math.random() * 2);
+        if(index==0) this.killerPosition.l--;
+        if(index==1) this.killerPosition.c--;
+      }
+      if(this.hasPosition(this.cima_baixo, l, c)){
+        let index = Math.floor(Math.random() * 2);
+        if(index==0) this.killerPosition.l--;
+        if(index==1) this.killerPosition.l++;
+      }
+      if(this.hasPosition(this.esquerda_baixo, l, c)){
+        let index = Math.floor(Math.random() * 2);
+        if(index==0) this.killerPosition.c--;
+        if(index==1) this.killerPosition.l++;
+      }
+      if(this.hasPosition(this.direita, l, c)){
+        this.killerPosition.c++;
+      }
+      if(this.hasPosition(this.cima, l, c)){
+        this.killerPosition.l--;
+      }
+      if(this.hasPosition(this.baixo, l, c)){
+        this.killerPosition.l++;
+      }
+      if(this.hasPosition(this.esquerda, l, c)){
+        this.killerPosition.c--;
+      }
+      if( Math.abs(this.killerPosition.l-this.playerPosition.l)<this.visibleRange &&
+          Math.abs(this.killerPosition.c-this.playerPosition.c)<this.visibleRange){
+            
+            this.visibleKiller = true;
+          }
+      else this.visibleKiller = false;
+      this.killerMoviment();
+    }, 200);
+  }
+
   hasPosition(array: Casa[], l:number, c:number):boolean {
     if(array.find(a=>a.l==l && a.c==c)!== undefined)
       return true
@@ -241,14 +329,15 @@ export class MapComponent implements OnInit {
   }
 
   hasCharacter(l:number, c: number): boolean{
-    if(this.playerPosition.l==l && this.playerPosition.c==c){
-      this.isPlayer = true;
-      this.isKiller = false;
-      return true;
-    };
     if(this.killerPosition.l==l && this.killerPosition.c==c){
       this.isPlayer = false;
       this.isKiller = true;
+      if(!this.visibleKiller) return false
+      return true;
+    };
+    if(this.playerPosition.l==l && this.playerPosition.c==c){
+      this.isPlayer = true;
+      this.isKiller = false;
       return true;
     };
     this.isPlayer = false;
@@ -294,6 +383,20 @@ export class MapComponent implements OnInit {
     }
 
     return 'bg-black';
+  }
+
+  getVisible(){
+    if(this.isKiller && !this.visibleKiller)
+      return false;
+    return true;
+  }
+
+  getImage(){
+    if(this.isPlayer){
+      if(this.isInjuriedPlayer) return '../../assets/injured_survivor.png';
+      else return '../../assets/survivor.png';
+    }
+    return '../../assets/killer.jpeg'
   }
 
   linkPalets(casa:Casa){

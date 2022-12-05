@@ -13,7 +13,7 @@
 </div>
 
 <ng-template #character>
-    <div class="block h-7 w-7 ">
-        <img [src]="(isPlayer) ? '../../assets/survivor.png' : '../../assets/killer.jpeg'" alt="character" width="28" height="28">
+    <div class='block h-7 w-7 border-2 border-gray-500 '>
+        <img *ngIf="getVisible()" [src]="getImage()" alt="character" width="28" height="28">
     </div>
 </ng-template>
