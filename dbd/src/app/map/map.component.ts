@@ -14,6 +14,10 @@ interface Palets {
   casa: Casa,
   aberta: boolean
 }
+interface Nos {
+  casa: Casa;
+  peso: number;
+}
 
 @Component({
   selector: 'app-map',
@@ -22,7 +26,26 @@ interface Palets {
 })
 export class MapComponent implements OnInit {
 
-  listas: LinkedList<number>[] = [];
+  listas: LinkedList<Nos>[] = [];
+
+  todos_os_lados: Casa[] = []
+  direita_cima_esquerda: Casa[] = []
+  direita_baixo_esquerda: Casa[] = []
+  cima_baixo_esquerda: Casa[] = []
+  cima_baixo_direita: Casa[] = []
+  direita_esquerda: Casa[] = []
+  direita_cima: Casa[] = []
+  direita_baixo: Casa[] = []
+  cima_esquerda: Casa[] = []
+  cima_baixo: Casa[] = []
+  esquerda_baixo: Casa[] = []
+  direita: Casa[] = []
+  cima: Casa[] = []
+  baixo: Casa[] = []
+  esquerda: Casa[] = []
+
+  pesoJanela: number = 5;
+  pesoPalet: number = 15;
 
   white: Casa[] = [];
   windows: Casa[] = [
@@ -96,11 +119,16 @@ export class MapComponent implements OnInit {
     if(key=='e'){
       this.acao();
     }
+
+    this.listas[0].push({casa:{l:1,c:1}, peso:1})
   }
 
   ngOnInit(): void {
     this.mapInit();
     this.startPositions();
+    this.gridInit();
+    this.graphInit();
+    
     if(this.playerPosition.l==5) this.direcao = "L";
     else this.direcao = "N";
     this.survivorMoviment();
@@ -157,7 +185,6 @@ export class MapComponent implements OnInit {
       if(this.hasGenerator()){
         if(this.generatorsProgress[generator]<10)
           this.generatorsProgress[generator]++;
-        if(this.generatorsProgress[generator]==10) this.completeGenerator(generator);
         this.generatorProgress(generator);
       }
     }, 1000);
@@ -166,9 +193,6 @@ export class MapComponent implements OnInit {
     }
   }
 
-  completeGenerator(generator:any){
-    
-  }
 
   survivorMoviment(){
 
@@ -265,6 +289,192 @@ export class MapComponent implements OnInit {
     }
 
     return 'bg-black';
+  }
+
+  graphInit(){
+    for(let i=0; i<29; i++){
+      for(let j=0; j<29; j++){
+        let index = parseInt(`${i}${j}`)
+        
+        this.listas[index] = new LinkedList<Nos>();
+        if(this.hasPosition(this.todos_os_lados, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+          //console.log(this.listas[index]);
+          
+        }
+        if(this.hasPosition(this.direita_cima_esquerda, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+        }
+        if(this.hasPosition(this.direita_baixo_esquerda, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+        }
+        if(this.hasPosition(this.cima_baixo_esquerda, i, j)){
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+        }
+        if(this.hasPosition(this.cima_baixo_direita, i, j)){
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+        }
+        if(this.hasPosition(this.direita_esquerda, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+        }
+        if(this.hasPosition(this.direita_cima, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+        }
+        if(this.hasPosition(this.direita_baixo, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+        }
+        if(this.hasPosition(this.cima_esquerda, i, j)){
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+        }
+        if(this.hasPosition(this.cima_baixo, i, j)){
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+        }
+        if(this.hasPosition(this.esquerda_baixo, i, j)){
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+        }
+        if(this.hasPosition(this.direita, i, j)){
+          this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
+        }
+        if(this.hasPosition(this.cima, i, j)){
+          this.listas[index].push({casa:{l:i-1, c:j}, peso:1})
+        }
+        if(this.hasPosition(this.baixo, i, j)){
+          this.listas[index].push({casa:{l:i+1, c:j}, peso:1})
+        }
+        if(this.hasPosition(this.esquerda, i, j)){
+          this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
+        }
+
+        /*if(this.hasPosition(this.windows, i, j)){
+          if(this.hasPosition(this.white, i-1, j)){
+            this.listas[index].push({casa:{l:i-1, c:j}, peso:this.pesoJanela})
+            this.listas[index].push({casa:{l:i+1, c:j}, peso:this.pesoJanela})
+            index = parseInt(`${i-1}${j}`);
+            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+            index = parseInt(`${i+1}${j}`);
+            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+          }
+          if(this.hasPosition(this.white, i, j-1)){
+            this.listas[index].push({casa:{l:i, c:j-1}, peso:this.pesoJanela})
+            this.listas[index].push({casa:{l:i, c:j+1}, peso:this.pesoJanela})
+            index = parseInt(`${i}${j-1}`);
+            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+            index = parseInt(`${i}${j+1}`);
+            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+          }
+        }*/
+      }
+    }
+    this.windowsInit();
+
+  }
+
+  windowsInit(){
+    this.windows.forEach(window=>{
+      let i = window.l;
+      let j = window.c;
+      let index = parseInt(`${i}${j}`)
+      if(this.hasPosition(this.white, i-1, j)){
+        this.listas[index].push({casa:{l:i-1, c:j}, peso:this.pesoJanela})
+        this.listas[index].push({casa:{l:i+1, c:j}, peso:this.pesoJanela})
+        index = parseInt(`${i-1}${j}`);
+        this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+        index = parseInt(`${i+1}${j}`);
+        this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+      }
+      if(this.hasPosition(this.white, i, j-1)){
+        this.listas[index].push({casa:{l:i, c:j-1}, peso:this.pesoJanela})
+        this.listas[index].push({casa:{l:i, c:j+1}, peso:this.pesoJanela})
+        index = parseInt(`${i}${j-1}`);
+        this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+        index = parseInt(`${i}${j+1}`);
+        this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
+      }
+    })
+  }
+
+  gridInit(){
+    this.white.forEach(casa=>{
+      if( this.hasPosition(this.white, casa.l-1, casa.c) && 
+          this.hasPosition(this.white, casa.l, casa.c-1) &&
+          this.hasPosition(this.white, casa.l+1, casa.c) &&
+          this.hasPosition(this.white, casa.l, casa.c+1))
+            this.todos_os_lados.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l-1, casa.c) && 
+              this.hasPosition(this.white, casa.l, casa.c-1) &&
+              this.hasPosition(this.white, casa.l, casa.c+1))
+                this.direita_cima_esquerda.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l+1, casa.c) && 
+              this.hasPosition(this.white, casa.l, casa.c-1) &&
+              this.hasPosition(this.white, casa.l, casa.c+1))
+                this.direita_baixo_esquerda.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l-1, casa.c) && 
+              this.hasPosition(this.white, casa.l+1, casa.c) &&
+              this.hasPosition(this.white, casa.l, casa.c-1))
+                this.cima_baixo_esquerda.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l-1, casa.c) && 
+              this.hasPosition(this.white, casa.l+1, casa.c) &&
+              this.hasPosition(this.white, casa.l, casa.c+1))
+                this.cima_baixo_direita.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l, casa.c+1) && 
+              this.hasPosition(this.white, casa.l, casa.c-1))
+                this.direita_esquerda.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l, casa.c+1) && 
+              this.hasPosition(this.white, casa.l-1, casa.c))
+                this.direita_cima.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l, casa.c+1) && 
+              this.hasPosition(this.white, casa.l+1, casa.c))
+                this.direita_baixo.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l-1, casa.c) && 
+              this.hasPosition(this.white, casa.l, casa.c-1))
+                this.cima_esquerda.push(casa);
+                
+      else if(this.hasPosition(this.white, casa.l-1, casa.c) && 
+              this.hasPosition(this.white, casa.l+1, casa.c))
+                this.cima_baixo.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l, casa.c-1) && 
+              this.hasPosition(this.white, casa.l+1, casa.c))
+                this.esquerda_baixo.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l, casa.c+1))
+              this.direita.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l-1, casa.c))
+              this.cima.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l+1, casa.c))
+              this.baixo.push(casa);
+
+      else if(this.hasPosition(this.white, casa.l, casa.c-1))
+              this.esquerda.push(casa);
+      
+    })
   }
 
   mapInit(){
