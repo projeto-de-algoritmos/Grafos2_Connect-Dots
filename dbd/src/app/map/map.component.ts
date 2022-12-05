@@ -140,7 +140,10 @@ export class MapComponent implements OnInit {
 
     if(palet){
       this.palets.forEach(p=>{
-        if(p==palet) p.aberta = false;
+        if(p==palet){
+          this.linkPalets(p.casa);
+          p.aberta = false;
+        }
       })
     }
     if(generator){
@@ -149,7 +152,9 @@ export class MapComponent implements OnInit {
         
       })
     }
-    
+    console.log(this.listas[1419]);
+    console.log(this.listas[1519]);
+    console.log(this.listas[1619]);
   }
 
   hasPalet():any{
@@ -291,6 +296,49 @@ export class MapComponent implements OnInit {
     return 'bg-black';
   }
 
+  linkPalets(casa:Casa){
+    let i = casa.l;
+    let j = casa.c;
+    let index = parseInt(`${i}${j}`);
+    if(this.hasPosition(this.white, i-1, j)){
+      this.listas[index] = new LinkedList<Nos>();
+      this.listas[index].push({casa:{l:i-1, c:j}, peso:this.pesoPalet})
+      this.listas[index].push({casa:{l:i+1, c:j}, peso:this.pesoPalet})
+
+      index = parseInt(`${i-1}${j}`)
+      this.linkAdjacentPalet(index, i, j);
+
+      index = parseInt(`${i+1}${j}`);
+      this.linkAdjacentPalet(index, i, j)
+    }
+    if(this.hasPosition(this.white, i, j-1)){
+      this.listas[index] = new LinkedList<Nos>();
+      this.listas[index].push({casa:{l:i, c:j-1}, peso:this.pesoPalet})
+      this.listas[index].push({casa:{l:i, c:j+1}, peso:this.pesoPalet})
+
+      index = parseInt(`${i}${j-1}`)
+      this.linkAdjacentPalet(index, i, j);
+
+      index = parseInt(`${i}${j+1}`);
+      this.linkAdjacentPalet(index, i, j)
+    }
+  }
+
+  linkAdjacentPalet(index:number, i:number, j:number){
+    let nodeAux = this.listas[index].start;
+    let end = false;
+    while(!end) {
+      if(nodeAux.value.casa.l==i && nodeAux.value.casa.c==j){
+        nodeAux.value.peso = this.pesoPalet;
+      }
+      if (nodeAux.prox !== null) {
+        nodeAux = nodeAux.prox;
+      } else {
+        end = true;
+      }
+    }
+  }
+
   graphInit(){
     for(let i=0; i<29; i++){
       for(let j=0; j<29; j++){
@@ -361,25 +409,6 @@ export class MapComponent implements OnInit {
         if(this.hasPosition(this.esquerda, i, j)){
           this.listas[index].push({casa:{l:i, c:j-1}, peso:1})
         }
-
-        /*if(this.hasPosition(this.windows, i, j)){
-          if(this.hasPosition(this.white, i-1, j)){
-            this.listas[index].push({casa:{l:i-1, c:j}, peso:this.pesoJanela})
-            this.listas[index].push({casa:{l:i+1, c:j}, peso:this.pesoJanela})
-            index = parseInt(`${i-1}${j}`);
-            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
-            index = parseInt(`${i+1}${j}`);
-            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
-          }
-          if(this.hasPosition(this.white, i, j-1)){
-            this.listas[index].push({casa:{l:i, c:j-1}, peso:this.pesoJanela})
-            this.listas[index].push({casa:{l:i, c:j+1}, peso:this.pesoJanela})
-            index = parseInt(`${i}${j-1}`);
-            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
-            index = parseInt(`${i}${j+1}`);
-            this.listas[index].push({casa:{l:i, c:j}, peso:this.pesoJanela})
-          }
-        }*/
       }
     }
     this.windowsInit();
