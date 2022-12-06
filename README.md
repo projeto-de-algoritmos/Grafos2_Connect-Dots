@@ -31,11 +31,11 @@ Para rodar o projeto é necessário ter instalado o framework Angular na máquin
 ### Iniciando o porjeto
 Para rodar o código, primeiro clone este repositório em um diretório de sua preferência com o git
 
-`git clone https://github.com/projeto-de-algoritmos/Grafos1_Pac-Man.git`
+`git clone https://github.com/projeto-de-algoritmos/Grafos2_DeadByDaylight.git`
 
 Em seguida acesse a pasta do código no repositório clonado
 
-`cd Grafos1_Pac-Man/pacman`
+`cd Grafos2_DeadByDaylight/dbd`
 
 Instale as dependencias do projeto
 
