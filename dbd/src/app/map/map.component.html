@@ -1,3 +1,4 @@
+<div class="flex flex-row items-start">
 <div class="flex flex-col m-4">
     <div class="flex flex-row" *ngFor="let item of [].constructor(29); let l = index">
         <div *ngFor="let item of [].constructor(29); let c = index">
@@ -10,6 +11,11 @@
             </div>
         </div>
     </div>
+</div>
+<button
+ class="flex flex-row mt-4 flex-nowrap bg-yellow-500 text-black text-xl rounded-2xl py-1 px-4 border-2 border-white"
+        (click)="startGame()"
+>Start</button>
 </div>
 
 <ng-template #character>

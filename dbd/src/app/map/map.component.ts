@@ -3,8 +3,8 @@ import { LinkedList } from '../lista';
 import { HostListener } from '@angular/core';
 
 interface Arestas {
-  de: number;
-  para: number;
+  de: Casa;
+  para: Casa;
 }
 interface Casa {
   l: number;
@@ -17,6 +17,11 @@ interface Palets {
 interface Nos {
   casa: Casa;
   peso: number;
+}
+interface S {
+  de: Casa,
+  para: Casa,
+  custo: number
 }
 
 @Component({
@@ -85,12 +90,16 @@ export class MapComponent implements OnInit {
 
   playerPosition: Casa = {} as Casa;
   isPlayer: boolean = false;
-  isInjuriedPlayer: boolean = false;
+  isInjuredPlayer: boolean = false;
   killerPosition: Casa = {} as Casa;
   isKiller: boolean = false;
   direcao: string = 'L';
-  visibleKiller: boolean = false;
-  visibleRange = 15;
+  visibleKiller: boolean = true;
+  visibleRange = 10;
+
+  visitados: boolean[] = [];
+  s: Casa[] = [];
+  arestas: Arestas[] = [];
 
   key: any;
   lastTimeStamp:number = 0;
@@ -122,8 +131,6 @@ export class MapComponent implements OnInit {
     if(key=='e'){
       this.acao();
     }
-
-    this.listas[0].push({casa:{l:1,c:1}, peso:1})
   }
 
   ngOnInit(): void {
@@ -131,9 +138,12 @@ export class MapComponent implements OnInit {
     this.startPositions();
     this.gridInit();
     this.graphInit();
-    
     if(this.playerPosition.l==5) this.direcao = "L";
     else this.direcao = "N";
+    
+  }
+
+  startGame(){
     //start
     this.survivorMoviment();
     this.killerMoviment();
@@ -239,6 +249,8 @@ export class MapComponent implements OnInit {
     let l = this.killerPosition.l;
     let c = this.killerPosition.c;
     setTimeout(()=>{
+      if(!this.visibleKiller){
+       
       if(this.hasPosition(this.todos_os_lados, l, c)){
         let index = Math.floor(Math.random() * 4);
         if(index==0) this.killerPosition.l--;
@@ -311,13 +323,27 @@ export class MapComponent implements OnInit {
       }
       if(this.hasPosition(this.esquerda, l, c)){
         this.killerPosition.c--;
+      } 
       }
+
       if( Math.abs(this.killerPosition.l-this.playerPosition.l)<this.visibleRange &&
           Math.abs(this.killerPosition.c-this.playerPosition.c)<this.visibleRange){
             
             this.visibleKiller = true;
           }
       else this.visibleKiller = false;
+          
+      let lp = this.playerPosition.l;
+      let lc = this.playerPosition.c;
+      if(l == lp && c == lc){
+          this.isInjuredPlayer = true;
+          this.visibleKiller = false;
+          if(lp<14) this.killerPosition.l = 23;
+          else this.killerPosition.l = 5;
+          if(lc<14) this.killerPosition.c = 23;
+          else this.killerPosition.c = 5;
+        } 
+      
       this.killerMoviment();
     }, 200);
   }
@@ -393,7 +419,7 @@ export class MapComponent implements OnInit {
 
   getImage(){
     if(this.isPlayer){
-      if(this.isInjuriedPlayer) return '../../assets/injured_survivor.png';
+      if(this.isInjuredPlayer) return '../../assets/injured_survivor.png';
       else return '../../assets/survivor.png';
     }
     return '../../assets/killer.jpeg'
@@ -446,7 +472,8 @@ export class MapComponent implements OnInit {
     for(let i=0; i<29; i++){
       for(let j=0; j<29; j++){
         let index = parseInt(`${i}${j}`)
-        
+        this.visitados[index] = false;
+
         this.listas[index] = new LinkedList<Nos>();
         if(this.hasPosition(this.todos_os_lados, i, j)){
           this.listas[index].push({casa:{l:i, c:j+1}, peso:1})
